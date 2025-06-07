@@ -1,26 +1,37 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react';
 
 export default function App() {
-  const [comments, setComments] = useState([])
-  const [showComments, setShowComments] = useState(true)
-  const [inputPos, setInputPos] = useState(null)
-  const [newComment, setNewComment] = useState("")
+  const [comments, setComments] = useState([]);
+  const [showComments, setShowComments] = useState(true);
+  const [inputPos, setInputPos] = useState(null);
+  const [newComment, setNewComment] = useState("");
+
+  // 🔁 Load from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem("comments");
+    if (stored) setComments(JSON.parse(stored));
+  }, []);
+
+  // 💾 Save to localStorage
+  useEffect(() => {
+    localStorage.setItem("comments", JSON.stringify(comments));
+  }, [comments]);
 
   const handleIframeClick = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect()
+    const rect = e.currentTarget.getBoundingClientRect();
     setInputPos({
       x: e.clientX - rect.left,
       y: e.clientY - rect.top
-    })
-  }
+    });
+  };
 
   const handleAddComment = () => {
     if (newComment.trim()) {
-      setComments([...comments, { ...inputPos, text: newComment }])
-      setNewComment("")
-      setInputPos(null)
+      setComments([...comments, { ...inputPos, text: newComment }]);
+      setNewComment("");
+      setInputPos(null);
     }
-  }
+  };
 
   return (
     <div className="w-full h-screen flex flex-col">
@@ -33,19 +44,30 @@ export default function App() {
           {showComments ? 'Hide' : 'Show'} Comments
         </button>
       </header>
+
       <div className="relative flex-1 overflow-hidden">
-        <iframe
-          src="https://leads2apptsver1-0.vercel.app"
-          className="w-full h-full"
-          onClick={handleIframeClick}
-        />
+        <div
+  className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-500 text-xl"
+  onClick={handleIframeClick}
+>
+  Click anywhere to add a comment
+</div>
+
         {showComments && comments.map((c, i) => (
-          <div key={i} style={{ left: c.x, top: c.y }} className="absolute z-10 bg-yellow-400 text-sm px-2 py-1 rounded">
+          <div
+            key={i}
+            style={{ left: c.x, top: c.y }}
+            className="absolute z-10 bg-yellow-400 text-sm px-2 py-1 rounded"
+          >
             {c.text}
           </div>
         ))}
+
         {inputPos && (
-          <div style={{ left: inputPos.x, top: inputPos.y }} className="absolute z-20 bg-white border p-2 rounded shadow">
+          <div
+            style={{ left: inputPos.x, top: inputPos.y }}
+            className="absolute z-20 bg-white border p-2 rounded shadow"
+          >
             <textarea
               className="border w-48 h-20 p-1"
               value={newComment}
@@ -61,5 +83,5 @@ export default function App() {
         )}
       </div>
     </div>
-  )
+  );
 }
