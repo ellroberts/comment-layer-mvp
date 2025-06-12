@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from './supabase';
-import CommentPin from './CommentPin';
 
 export default function App() {
   const [comments, setComments] = useState([]);
+  const [showComments, setShowComments] = useState(true);
   const [inputPos, setInputPos] = useState(null);
   const [newComment, setNewComment] = useState('');
   const [draggingIndex, setDraggingIndex] = useState(null);
@@ -42,10 +43,7 @@ export default function App() {
         return updated;
       });
 
-      supabase
-        .from('commenting')
-        .update({ x: newX, y: newY })
-        .eq('id', comments[draggingIndex].id);
+      supabase.from('commenting').update({ x: newX, y: newY }).eq('id', comments[draggingIndex].id);
     }
   };
 
@@ -90,7 +88,7 @@ export default function App() {
     if (error) {
       console.error('Delete error:', error);
     } else {
-      setComments(comments.filter((c) => c.id !== id));
+      setComments(comments.filter(c => c.id !== id));
     }
   };
 
@@ -103,10 +101,7 @@ export default function App() {
       onMouseUp={handleMouseUp}
     >
       {inputPos && (
-        <div
-          className="absolute bg-white border rounded shadow p-2"
-          style={{ top: inputPos.y, left: inputPos.x }}
-        >
+        <div className="absolute bg-white border rounded shadow p-2" style={{ top: inputPos.y, left: inputPos.x }}>
           <input
             className="border p-1"
             value={newComment}
@@ -120,12 +115,15 @@ export default function App() {
       )}
 
       {comments.map((comment, index) => (
-        <CommentPin
+        <div
           key={comment.id}
-          comment={comment}
+          className="absolute cursor-move"
+          style={{ top: comment.y, left: comment.x }}
           onMouseDown={(e) => handleMouseDown(e, index)}
-          onDelete={handleDelete}
-        />
+          onDoubleClick={() => handleDelete(comment.id)}
+        >
+          📍
+        </div>
       ))}
     </div>
   );
