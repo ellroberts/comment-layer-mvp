@@ -1,16 +1,19 @@
+// App.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from './supabase';
 import CommentPin from './CommentPin';
+import FloatingToolbar from './components/FloatingToolbar';
 
 export default function App() {
   const [comments, setComments] = useState([]);
   const [inputPos, setInputPos] = useState(null);
   const [newComment, setNewComment] = useState('');
   const [draggingIndex, setDraggingIndex] = useState(null);
-  const containerRef = useRef(null);
   const [wasDragging, setWasDragging] = useState(false);
+  const [commentMode, setCommentMode] = useState(true);
+  const [showComments, setShowComments] = useState(true);
+  const containerRef = useRef(null);
 
-  // Load comments from Supabase
   useEffect(() => {
     const fetchComments = async () => {
       const { data, error } = await supabase.from('commenting').select('*');
@@ -55,7 +58,7 @@ export default function App() {
   };
 
   const handleCanvasClick = (e) => {
-    if (wasDragging) {
+    if (!commentMode || wasDragging) {
       setWasDragging(false);
       return;
     }
@@ -95,38 +98,48 @@ export default function App() {
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="relative w-full h-screen bg-white"
-      onClick={handleCanvasClick}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-    >
-      {inputPos && (
-        <div
-          className="absolute bg-white border rounded shadow p-2"
-          style={{ top: inputPos.y, left: inputPos.x }}
-        >
-          <input
-            className="border p-1"
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Add a comment"
-          />
-          <button onClick={handleSubmit} className="ml-2 bg-blue-500 text-white px-2 rounded">
-            Submit
-          </button>
-        </div>
-      )}
+    <>
+      <div
+        ref={containerRef}
+        className="relative w-full h-screen bg-white"
+        onClick={handleCanvasClick}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+      >
+        {inputPos && commentMode && (
+          <div
+            className="absolute bg-white border rounded shadow p-2"
+            style={{ top: inputPos.y, left: inputPos.x }}
+          >
+            <input
+              className="border p-1"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              placeholder="Add a comment"
+            />
+            <button onClick={handleSubmit} className="ml-2 bg-blue-500 text-white px-2 rounded">
+              Submit
+            </button>
+          </div>
+        )}
 
-      {comments.map((comment, index) => (
-        <CommentPin
-          key={comment.id}
-          comment={comment}
-          onMouseDown={(e) => handleMouseDown(e, index)}
-          onDelete={handleDelete}
-        />
-      ))}
-    </div>
+        {showComments &&
+          comments.map((comment, index) => (
+            <CommentPin
+              key={comment.id}
+              comment={comment}
+              onMouseDown={(e) => handleMouseDown(e, index)}
+              onDelete={handleDelete}
+            />
+          ))}
+      </div>
+
+      <FloatingToolbar
+        showComments={showComments}
+        toggleShowComments={() => setShowComments((prev) => !prev)}
+        commentMode={commentMode}
+        toggleCommentMode={() => setCommentMode((prev) => !prev)}
+      />
+    </>
   );
 }
