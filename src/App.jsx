@@ -1,4 +1,3 @@
-// App.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from './supabase';
 import CommentPin from './CommentPin';
@@ -101,37 +100,51 @@ export default function App() {
     <>
       <div
         ref={containerRef}
-        className="relative w-full h-screen bg-white"
+        className="relative w-full h-screen bg-white overflow-hidden"
         onClick={handleCanvasClick}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        {inputPos && commentMode && (
-          <div
-            className="absolute bg-white border rounded shadow p-2"
-            style={{ top: inputPos.y, left: inputPos.x }}
-          >
-            <input
-              className="border p-1"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add a comment"
-            />
-            <button onClick={handleSubmit} className="ml-2 bg-blue-500 text-white px-2 rounded">
-              Submit
-            </button>
-          </div>
-        )}
+        {/* Prototype layer (iframe or image) */}
+        <iframe
+          src="https://cpq-mobile-v1.vercel.app/mobile-selection" // Replace with your prototype URL
+          title="Prototype"
+          className={`absolute top-0 left-0 w-full h-full ${commentMode ? 'pointer-events-none' : 'pointer-events-auto'}`}
+        />
 
-        {showComments &&
-          comments.map((comment, index) => (
-            <CommentPin
-              key={comment.id}
-              comment={comment}
-              onMouseDown={(e) => handleMouseDown(e, index)}
-              onDelete={handleDelete}
-            />
-          ))}
+        {/* Comment overlay */}
+        <div
+  className={`absolute top-0 left-0 w-full h-full z-10 ${
+    commentMode ? '' : 'pointer-events-none'
+  }`}
+>
+          {inputPos && commentMode && (
+            <div
+              className="absolute bg-white border rounded shadow p-2"
+              style={{ top: inputPos.y, left: inputPos.x }}
+            >
+              <input
+                className="border p-1"
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                placeholder="Add a comment"
+              />
+              <button onClick={handleSubmit} className="ml-2 bg-blue-500 text-white px-2 rounded">
+                Submit
+              </button>
+            </div>
+          )}
+
+          {showComments &&
+            comments.map((comment, index) => (
+              <CommentPin
+                key={comment.id}
+                comment={comment}
+                onMouseDown={(e) => handleMouseDown(e, index)}
+                onDelete={handleDelete}
+              />
+            ))}
+        </div>
       </div>
 
       <FloatingToolbar
