@@ -124,24 +124,37 @@ export default function App() {
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        {inputPos && commentMode && (
-          <div
-            ref={inputRef}
-            className="absolute bg-white border rounded shadow p-2 z-50"
-            style={{ top: inputPos.y, left: inputPos.x }}
-          >
-            <input
-              autoFocus
-              className="border p-1"
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              placeholder="Add a comment"
-            />
-            <button onClick={handleSubmit} className="ml-2 bg-blue-500 text-white px-2 rounded">
-              Submit
-            </button>
-          </div>
-        )}
+  {inputPos && commentMode && (
+  <div
+    ref={inputRef}
+    className="absolute bg-white border rounded shadow p-2 z-50"
+    style={{ top: inputPos.y, left: inputPos.x }}
+  >
+    <input
+      autoFocus
+      className="border p-1"
+      value={newComment}
+      onChange={(e) => setNewComment(e.target.value)}
+      placeholder="Add a comment"
+    />
+    <button
+      onClick={handleSubmit}
+      className="ml-2 bg-blue-500 text-white px-2 rounded"
+    >
+      Submit
+    </button>
+    <button
+  onClick={(e) => {
+    e.stopPropagation(); // ⛔️ Stop the event from reaching the canvas
+    setInputPos(null);
+    setNewComment('');
+  }}
+  className="ml-2 text-gray-500 hover:text-black text-sm"
+>
+  Close
+</button>
+  </div>
+)}
 
         {showComments &&
           comments.map((comment, index) => (
