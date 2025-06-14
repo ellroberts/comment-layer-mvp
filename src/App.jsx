@@ -138,11 +138,14 @@ export default function App() {
       placeholder="Add a comment"
     />
     <button
-      onClick={handleSubmit}
-      className="ml-2 bg-blue-500 text-white px-2 rounded"
-    >
-      Submit
-    </button>
+  onClick={(e) => {
+    e.stopPropagation(); // ⛔️ Prevent canvas click from firing
+    handleSubmit();
+  }}
+  className="ml-2 bg-blue-500 text-white px-2 rounded"
+>
+  Submit
+</button>
     <button
   onClick={(e) => {
     e.stopPropagation(); // ⛔️ Stop the event from reaching the canvas
